@@ -18,11 +18,13 @@
 (in-suite bulk-rename/test)
 
 (test insert-chars
-  ;;normal usage
-  (is (string= "123foo456" (insert-chars "123456" "foo" 3)))
-  ;;should reject negative position
-  (is (string= "123456" (insert-chars "123456" "foo" -1)))
-  )
+  (let ((start-str "123456")
+        (insert-str "foo"))
+    ;;normal usage
+    (is (string= "123foo456" (insert-chars start-str insert-str 3)))
+    ;;should reject negative position
+    (is (string= "123456" (insert-chars start-str insert-str -1)))
+    ))
 
 (test insert-datetime
   )
@@ -37,7 +39,14 @@
   )
 
 (test remove-chars
-  )
+  (let ((start-str "123456"))
+    ;; should remove the right number of chars
+    (is (string= "1256" (remove-chars start-str 2 4)))
+    ;;should clamp from-pos to the beginning of the string
+    (is (string= "12345" (remove-chars start-str 5 10)))
+    ;;should clamp to-pos to the length of the string
+    (is (string= "23456" (remove-chars start-str -10 1)))))
+    
 
 (test replace-plain
   )
@@ -46,4 +55,25 @@
   )
 
 (test change-case
+  (let ((upper-string "QWE")
+        (lower-string "qwe"))
+    (is (string= lower-string (change-case upper-string "lower")))
+    (is (string= upper-string (change-case lower-string "upper"))))
+  (is (string= "123" (change-case "123" "up")))
+  ;; camel
+  
+  ;;FIXME iterate over test cases
+  ;; (let ((test-cases '(("FooBar" "FooBar")
+  ;;                     ("fooBar" "fooBar")
+  ;;                     ("foo_bar" "fooBar")
+  ;;                     ("foo-bar" "fooBar"))))
+  ;;   (mapcar test-cases
+  ;;           (lambda (tc)
+  ;;             (let ((in-str (car tc))
+  ;;                   (expected (
+  ;;             (is (string= expected (change-case input-str "camel"))))
+  
+  ;; (is (string= "FooBar" (change-case "FooBar" "camel")))
+  ;; (is (string= "fooBar" (change-case "fooBar" "camel")))
+  ;;snake
   )
