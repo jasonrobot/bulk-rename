@@ -1,3 +1,0 @@
-#! /usr/bin/env bash
-
-sbcl --noinform --non-interactive --eval "(progn (require :bulk-rename-test) (asdf:test-system 'bulk-rename))"
