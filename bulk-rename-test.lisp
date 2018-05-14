@@ -36,7 +36,9 @@
     (is (string= "123foo" (overwrite-chars start-str over-str 3)))))
 
 (test numbering
-  )
+  (let ((start-str '("foo" "bar" "baz")))
+    ;;test that the first chars of each of the results is correct
+    (is (= 1 1))))
 
 (test remove-chars
   (let ((start-str "123456"))

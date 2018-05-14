@@ -1,23 +1,7 @@
 ;;; Bulk rename
 ;; rename a bunch of files!
 
-(defpackage :bulk-rename
-  (:use :cl)
-  (:export :insert-chars
-           :remove-chars
-           :overwrite-chars
-           :change-case))
-
-(in-package :bulk-rename)
-
-(defun my-command-line ()
-  "Reads command line args."
-  (or 
-   #+CLISP *args*
-   #+SBCL *posix-argv*  
-   #+LISPWORKS system:*line-arguments-list*
-   #+CMU extensions:*command-line-words*
-   nil))
+;;; Commentary:
 
 ;; operations:
 ;; insert
@@ -44,6 +28,24 @@
 ;; for the rest, since strings can work like arrays,
 ;; I think most of the rest will have to be array functions
 
+(defpackage :bulk-rename
+  (:use :cl)
+  (:export :insert-chars
+           :remove-chars
+           :overwrite-chars
+           :change-case))
+
+(in-package :bulk-rename)
+
+(defun my-command-line ()
+  "Reads command line args."
+  (or 
+   #+CLISP *args*
+   #+SBCL *posix-argv*  
+   #+LISPWORKS system:*line-arguments-list*
+   #+CMU extensions:*command-line-words*
+   nil))
+
 (defun insert-chars (base-string new-string position)
   (if (< position 0)
       base-string
@@ -65,6 +67,15 @@
                    new-string
                    (subseq base-string
                            (+ position (length new-string))))))
+
+(defun numbering (strings start separator)
+  (mapcar strings
+          (lambda (s)
+            (insert-chars s
+                          (concatenate 'string
+                                       "69"
+                                       separator)
+                          0))))
 
 (defun remove-chars (base-string from-position to-position)
   "Remove characters from the filename."
