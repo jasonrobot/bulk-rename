@@ -53,4 +53,3 @@
   (format t "Starting up!")
   ;; (write argv))
   (write (insert-chars (elt argv 0) (elt argv 1) (parse-integer (elt argv 2)))))
-;; (format t "~S" (insert-chars
