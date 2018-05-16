@@ -79,3 +79,8 @@
   ;; (is (string= "fooBar" (change-case "fooBar" "camel")))
   ;;snake
   )
+
+
+;;; testing stuff from main
+(test get-string-after-match
+  (is (string= "baz" (get-string-after-match "bar" '("foo" "bar" "baz")))))
