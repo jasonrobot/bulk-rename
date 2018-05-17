@@ -56,13 +56,25 @@
 (test replace-regexp
   )
 
+(defmacro do-list-destructure (list-of-lists lambda-list &rest forms)
+  (let ((temp-item (gensym)))
+    `(dolist (,temp-item ,list-of-lists)
+       (destructuring-bind ,lambda-list ,temp-item
+         ,@forms))))
+
+;; (test foobar
+  ;; (do-list-destructure
+      ;; '((1 2) (3 4))
+    ;; (input expected)
+    ;; (is (= expected (+ 1 input)))))
+                       
 (test change-case-upper
-  (let ((test-cases '(("foo" "FOO")
-                      ("FOO" "FOO"))))
-    (dolist (test-case test-cases)
-      (destructuring-bind (input expected) test-case
-        (is (string= expected (change-case input "up")))
-        (is (string= expected (change-case input "uppper")))))))
+  (do-list-destructure
+      '(("foo" "FOO")
+        ("FOO" "FOO"))
+    (input expected)
+    (is (string= expected (change-case input "up")))
+    (is (string= expected (change-case input "upper")))))
 
 ;; (test change-case-camel
   ;; (let ((test-cases '(("FooBar" "FooBar")
@@ -76,20 +88,11 @@
 ;;; testing stuff from main
 (test get-string-after-match
   ;; test-cases :: (input) argument expected-result
-  (let ((test-cases '((("foo" "bar") "foo" "bar")
-                      (("foo") "foo" nil)
-                      (("foo" "bar") "bar" nil)
-                      (("foo" "bar" "baz") "bar" "baz"))))
-    ;; (write t "test-cases: ~D~%" (length (test-cases)))
-    ;; (is (= 4 (length test-cases)))
-    (dolist (test-case test-cases)
-      ;; (write t
-             ;; "test-case: ~A ~A ~A~%"
-             ;; (first test-case)
-             ;; (second test-case)
-      ;; (third test-case))
-      (is (= 3 (length test-case)))
-      (destructuring-bind (input arg expected) test-case
-          (if expected
-              (is (string= expected (get-string-after-match arg input)))
-              (is (null (get-string-after-match arg input))))))))
+  (do-list-destructure '((("foo" "bar") "foo" "bar")
+                         (("foo") "foo" nil)
+                         (("foo" "bar") "bar" nil)
+                         (("foo" "bar" "baz") "bar" "baz"))
+  (input arg expected)
+  (if expected
+      (is (string= expected (get-string-after-match arg input)))
+      (is (null (get-string-after-match arg input))))))
