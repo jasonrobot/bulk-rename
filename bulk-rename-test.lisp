@@ -56,31 +56,40 @@
 (test replace-regexp
   )
 
-(test change-case
-  (let ((upper-string "QWE")
-        (lower-string "qwe"))
-    (is (string= lower-string (change-case upper-string "lower")))
-    (is (string= upper-string (change-case lower-string "upper"))))
-  (is (string= "123" (change-case "123" "up")))
-  ;; camel
-  
-  ;;FIXME iterate over test cases
-  ;; (let ((test-cases '(("FooBar" "FooBar")
-  ;;                     ("fooBar" "fooBar")
-  ;;                     ("foo_bar" "fooBar")
-  ;;                     ("foo-bar" "fooBar"))))
-  ;;   (mapcar test-cases
-  ;;           (lambda (tc)
-  ;;             (let ((in-str (car tc))
-  ;;                   (expected (
-  ;;             (is (string= expected (change-case input-str "camel"))))
-  
-  ;; (is (string= "FooBar" (change-case "FooBar" "camel")))
-  ;; (is (string= "fooBar" (change-case "fooBar" "camel")))
-  ;;snake
-  )
+(test change-case-upper
+  (let ((test-cases '(("foo" "FOO")
+                      ("FOO" "FOO"))))
+    (dolist (test-case test-cases)
+      (destructuring-bind (input expected) test-case
+        (is (string= expected (change-case input "up")))
+        (is (string= expected (change-case input "uppper")))))))
 
+;; (test change-case-camel
+  ;; (let ((test-cases '(("FooBar" "FooBar")
+                      ;; ("fooBar" "fooBar")
+                      ;; ("foo_bar" "fooBar")
+                      ;; ("foo-bar" "fooBar"))))
+    ;; (dolist (test-case test-cases)
+      ;; (destructuring-bind (input expected) test-case
+          ;; (is (string= expected (change-case input "camel")))))))
 
 ;;; testing stuff from main
 (test get-string-after-match
-  (is (string= "baz" (get-string-after-match "bar" '("foo" "bar" "baz")))))
+  ;; test-cases :: (input) argument expected-result
+  (let ((test-cases '((("foo" "bar") "foo" "bar")
+                      (("foo") "foo" nil)
+                      (("foo" "bar") "bar" nil)
+                      (("foo" "bar" "baz") "bar" "baz"))))
+    ;; (write t "test-cases: ~D~%" (length (test-cases)))
+    ;; (is (= 4 (length test-cases)))
+    (dolist (test-case test-cases)
+      ;; (write t
+             ;; "test-case: ~A ~A ~A~%"
+             ;; (first test-case)
+             ;; (second test-case)
+      ;; (third test-case))
+      (is (= 3 (length test-case)))
+      (destructuring-bind (input arg expected) test-case
+          (if expected
+              (is (string= expected (get-string-after-match arg input)))
+              (is (null (get-string-after-match arg input))))))))
