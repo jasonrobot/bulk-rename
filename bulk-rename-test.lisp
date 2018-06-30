@@ -25,7 +25,7 @@
 
 (def-suite bulk-rename/rename-test
     :description "Test suite for the functions that do the renaming work.")
-(in-suite bulk-rename/test)
+(in-suite bulk-rename/rename-test)
 
 (test insert-chars
   (let ((start-str "123456")

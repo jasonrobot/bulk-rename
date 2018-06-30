@@ -21,5 +21,5 @@
   ;;test build
   :perform (test-op (o c)
                     (uiop:symbol-call :fiveam '#:run!
-                                      (uiop:find-symbol* '#:bulk-rename/test
+                                      (uiop:find-symbol* '#:bulk-rename/rename-test
                                                          :bulk-rename-test))))

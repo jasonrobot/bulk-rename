@@ -88,13 +88,13 @@ bulk-rename case (UPPER|UP|LOWER|DOWN|CAMEL|SNAKE|LISP|KEBAB) FILES
               (insert-chars name (elt real-args 0) (parse-integer (elt real-args 1))))
             names)))
 
-(defun do-rename (args)
-    "ARGS is a list of strings."
-  (let* ((names (get-names args))
-         (operation (get-operation args))
-         (op-args (get-operation-args operation args)))
-    (mapcar (lambda (name)
-              (apply operation op-args name)))))
+;; (defun do-rename (args)
+;;     "ARGS is a list of strings."
+;;   (let* ((names (get-names args))
+;;          (operation (get-operation args))
+;;          (op-args (get-operation-args operation args)))
+;;     (mapcar (lambda (name)
+;;               (apply operation op-args name)))))
 
 (defun start () (main (uiop:command-line-arguments)))
 
