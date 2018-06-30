@@ -88,6 +88,20 @@ bulk-rename case (UPPER|UP|LOWER|DOWN|CAMEL|SNAKE|LISP|KEBAB) FILES
               (insert-chars name (elt real-args 0) (parse-integer (elt real-args 1))))
             names)))
 
+(defun do-remove-chars (args)
+  (let* ((real-args (parse-keywords args "from" "to"))
+         (names (get-names args (length real-args))))
+    (mapcar (lambda (name)
+              (apply #'remove-chars '(name . real-args)))
+            names)))
+
+(defun do-rename (args rename-function keywords)
+  (let* ((real-args (apply #'parse-keywords '(args . keywords)))
+         (names (get-names args (length keywords))))
+    (mapcar (lambda (name)
+              (apply rename-function '(name . real-args)))
+            names)))
+
 ;; (defun do-rename (args)
 ;;     "ARGS is a list of strings."
 ;;   (let* ((names (get-names args))
