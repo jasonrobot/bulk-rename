@@ -30,99 +30,74 @@
 
 (defpackage :bulk-rename
   (:use :cl)
-  (:export :insert-chars
+  (:export :start
+           :insert-chars
            :remove-chars
            :overwrite-chars
            :change-case
-           :start
-           :get-string-after-match))
+           :get-string-after-match
+           :parse-keywords))
 
 (in-package :bulk-rename)
-
-;; (defun my-command-line ()
-;;   "Reads command line args."
-;;   (or 
-;;    #+CLISP *args*
-;;    #+SBCL *posix-argv*  
-;;    #+LISPWORKS system:*line-arguments-list*
-;;    #+CMU extensions:*command-line-words*
-;;    nil))
 
 (defun print-help ()
   (format t "Help:
 Insertion:
-bulk-rename FILES insert STRING at POSITION
+bulk-rename insert STRING at POSITION FILES
 
 Overwrite:
-bulk-rename FILES overwrite STRING at POSITION
+bulk-rename overwrite STRING at POSITION FILES
 
 Numbering:
-bulk-rename FILES numbering from START separator STRING
+bulk-rename numbering from START separator STRING FILES
 
 Removal:
-bulk-rename FILES remove from START to END
+bulk-rename remove from START to END FILES
 
 Replace:
-bulk-rename FILES replace STRING with STRING
+bulk-rename replace STRING with STRING FILES
 
 Regexp:
-bulk-rename FILES regex STRING replace STRING
+bulk-rename regex STRING replace STRING FILES
 
 Change Case:
-bulk-rename FILES case (UPPER|UP|LOWER|DOWN|CAMEL|SNAKE|LISP|KEBAB)
+bulk-rename case (UPPER|UP|LOWER|DOWN|CAMEL|SNAKE|LISP|KEBAB) FILES
 "))
 
-;; (defun parse-mode-args (&rest keywords)
-  ;; "Return a function that parses arg lists.
-
-;; The function returned will return a list of whatever appears after its keywords.
-;; So something like (string) => (lambda (string) (object)
-
-;; The function will make some assumptions about types. Keywords like 'from' or 'at'
-;; will be parsed to integers, the rest will be left as strings."
-  ;; #'(lambda (args)
-      ;; (let ((
+;;; Functions that are associated with unpacking the command line args
 
 (defun get-string-after-match (item source-sequence)
+  "Get the string after a match in a list of strings. NIL if no match or no next string after match."
   (let ((item-pos (position-if #'(lambda (x) (string= x item))
                                source-sequence)))
-    (when item-pos
-      (let* ((target-pos (+ 1 item-pos))
-             (space-in-seq (< target-pos (length source-sequence))))
-        (when space-in-seq
-          (elt source-sequence target-pos))))))
+    (when (and item-pos
+               (< (+ item-pos 1) (length source-sequence)))
+      (elt source-sequence (+ 1 item-pos)))))
 
 (defun parse-keywords (args &rest keywords)
-  (mapcar keywords #'(lambda (kw) (get-string-after-match kw args))))
+  "Grabs data out of the args list."
+  (mapcar #'(lambda (kw) (get-string-after-match kw args)) keywords))
 
-;; (defun insert-chars-parser (args)
-;;   (let ((insert-pos (position-if #'(lambda (x) (string= x "insert"))
-;;                                  args))
-;;         (at-pos (position-if #'(lambda (x) (string= x "at"))
-;;                              args)))
-;;     (if (or (= NIL insert-pos)
-;;             (= NIL at-pos))
-;;         "return some error"
-;;         ;;else
-;;         (list (insert-arg (elt args (+ 1 insert-pos)))
-;;               (at-arg (elt args (+ 1 at-pos)))))))
+(defun get-names (args number-of-keyword-args)
+  (subseq args (* number-of-keyword-args 2)))
 
-(defun parse-mode (mode-arg)
-  "Returns the function to use for the given mode"
-  (case mode-arg
-    ("insert" 'insert-chars-parser)
-    ("overwrite" 'overwrite-chars-parser)
-    ("numbering" 'numbering-parser)
-    ("remove" 'remove-chars-parser)
-    ("replace" 'replace-plain-parser)
-    ("regex" 'replace-regexp-parser)
-    ("case" 'change-case-parser)))
+(defun do-insert-chars (args)
+  (let ((real-args (parse-keywords args "insert" "at"))
+        (names (get-names args 2)))
+    (mapcar (lambda (name)
+              (insert-chars name (elt real-args 0) (parse-integer (elt real-args 1))))
+            names)))
+
+(defun do-rename (args)
+    "ARGS is a list of strings."
+  (let* ((names (get-names args))
+         (operation (get-operation args))
+         (op-args (get-operation-args operation args)))
+    (mapcar (lambda (name)
+              (apply operation op-args name)))))
 
 (defun start () (main (uiop:command-line-arguments)))
 
 (defun main (argv)
-  ;; (format t "Starting up!")
-  ;; (write argv))
-  (write (insert-chars (elt argv 0) (elt argv 1) (parse-integer (elt argv 2)))))
-  ;; (let ((action (parse-mode (elt argv 0))))
-    ;; (action (cddr argv))))
+  (write (do-insert-chars argv)))
+

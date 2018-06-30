@@ -8,32 +8,48 @@
         :fiveam))
 (in-package :bulk-rename-test)
 
-(defun add-2 (x)
-  (+ 2 x))
+(defmacro do-list-destructure (list-of-lists lambda-list &rest forms)
+  "Combine a dolist and a destructuring-bind."
+  (let ((temp-item (gensym)))
+    `(dolist (,temp-item ,list-of-lists)
+       (destructuring-bind ,lambda-list ,temp-item
+         ,@forms))))
 
-;; (format t "testing ~D" (add-2 10))
+(def-suite bulk-rename/main-test
+    :description "Test suite for the functions that handle the CLI tool.")
+(in-suite bulk-rename/main-test)
 
-(def-suite bulk-rename/test
-    :description "The main suite for bulk-rename")
+;; (test parse-mode
+;;   (do-list-destructure
+;;       '(())))
+
+(def-suite bulk-rename/rename-test
+    :description "Test suite for the functions that do the renaming work.")
 (in-suite bulk-rename/test)
 
 (test insert-chars
   (let ((start-str "123456")
         (insert-str "foo"))
-    ;;normal usage
-    (is (string= "123foo456" (insert-chars start-str insert-str 3)))
-    ;;should reject negative position
-    (is (string= "123456" (insert-chars start-str insert-str -1)))
-    ))
+    (do-list-destructure
+        '((3 "123foo456")
+          (-1 "123456")
+          (0 "foo123456")
+          (6 "123456foo"))
+      (position expected)
+      (is (string= expected (insert-chars start-str insert-str position))))))
 
 (test insert-datetime
   )
 
 (test overwrite-chars
-  (let ((start-str "1234")
-        (over-str "foo"))
-    (is (string= "foo4" (overwrite-chars start-str over-str 0)))
-    (is (string= "123foo" (overwrite-chars start-str over-str 3)))))
+  (let ((start-str "1234"))
+    (do-list-destructure
+        '(("foo" 0 "foo4")
+          ("foo" 3 "123foo")
+          ("foobar" 0 "foobar")
+          ("foo" 4 "1234foo"))
+      (over-str position expected)
+      (is (string= expected (overwrite-chars start-str over-str position))))))
 
 (test numbering
   (let ((start-str '("foo" "bar" "baz")))
@@ -42,31 +58,20 @@
 
 (test remove-chars
   (let ((start-str "123456"))
-    ;; should remove the right number of chars
-    (is (string= "1256" (remove-chars start-str 2 4)))
-    ;;should clamp from-pos to the beginning of the string
-    (is (string= "12345" (remove-chars start-str 5 10)))
-    ;;should clamp to-pos to the length of the string
-    (is (string= "23456" (remove-chars start-str -10 1)))))
-    
+    (do-list-destructure
+        '((2 4 "1256")
+          ;;should clamp to-pos to the length of the string
+          (5 10 "12345")
+          ;;should clamp from-pos to the beginning of the string
+          (-10 1 "23456"))
+      (from to expected)
+      (is (string= expected (remove-chars start-str from to))))))
 
 (test replace-plain
   )
 
 (test replace-regexp
   )
-
-(defmacro do-list-destructure (list-of-lists lambda-list &rest forms)
-  (let ((temp-item (gensym)))
-    `(dolist (,temp-item ,list-of-lists)
-       (destructuring-bind ,lambda-list ,temp-item
-         ,@forms))))
-
-;; (test foobar
-  ;; (do-list-destructure
-      ;; '((1 2) (3 4))
-    ;; (input expected)
-    ;; (is (= expected (+ 1 input)))))
                        
 (test change-case-upper
   (do-list-destructure
@@ -94,5 +99,7 @@
                          (("foo" "bar" "baz") "bar" "baz"))
   (input arg expected)
   (if expected
-      (is (string= expected (get-string-after-match arg input)))
-      (is (null (get-string-after-match arg input))))))
+      (is (string= expected (get-string-after-match arg input))
+          (format nil "input: ~A ~A expected: ~A" input arg expected))
+      (is (null (get-string-after-match arg input))
+          (format nil "input: ~A ~A expected: ~A" input arg expected)))))
