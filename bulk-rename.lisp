@@ -31,12 +31,13 @@
 (defpackage :bulk-rename
   (:use :cl)
   (:export :start
-           :insert-chars
-           :remove-chars
-           :overwrite-chars
            :change-case
+           :get-names
            :get-string-after-match
-           :parse-keywords))
+           :insert-chars
+           :overwrite-chars
+           :parse-keywords
+           :remove-chars))
 
 (in-package :bulk-rename)
 
@@ -78,8 +79,14 @@ bulk-rename case (UPPER|UP|LOWER|DOWN|CAMEL|SNAKE|LISP|KEBAB) FILES
   "Grabs data out of the args list."
   (mapcar #'(lambda (kw) (get-string-after-match kw args)) keywords))
 
-(defun get-names (args number-of-keyword-args)
-  (subseq args (* number-of-keyword-args 2)))
+(defun get-names (args delim)
+  ;; (subseq args (* number-of-keyword-args 2)))
+  (loop for item in args
+     until (string= item delim)
+     collect item))
+
+;; (defun get-rename-args (args delim)
+  
 
 (defun do-insert-chars (args)
   (let ((real-args (parse-keywords args "insert" "at"))

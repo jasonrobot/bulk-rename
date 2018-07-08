@@ -93,13 +93,21 @@
 ;;; testing stuff from main
 (test get-string-after-match
   ;; test-cases :: (input) argument expected-result
-  (do-list-destructure '((("foo" "bar") "foo" "bar")
-                         (("foo") "foo" nil)
-                         (("foo" "bar") "bar" nil)
-                         (("foo" "bar" "baz") "bar" "baz"))
+  (do-list-destructure
+      '((("foo" "bar") "foo" "bar")
+        (("foo") "foo" nil)
+        (("foo" "bar") "bar" nil)
+        (("foo" "bar" "baz") "bar" "baz"))
   (input arg expected)
   (if expected
       (is (string= expected (get-string-after-match arg input))
           (format nil "input: ~A ~A expected: ~A" input arg expected))
       (is (null (get-string-after-match arg input))
           (format nil "input: ~A ~A expected: ~A" input arg expected)))))
+
+(test get-names
+  (do-list-destructure
+      '((("foo") "insert" '())
+        ("foo" "bar")
+    (names delim expected)
+    (is (string= (elt (get-names names delim) 0) expected))))
