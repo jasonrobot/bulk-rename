@@ -6,8 +6,6 @@ enum RenamerName {
     REMOVE,
 }
 
-
-
 impl fmt::Display for RenamerName {
     fn fmt(&self , f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{:?}", self)
@@ -20,7 +18,7 @@ const RENAMER_NAMES : Vec<&str> = vec![
 ];
 
 fn get_renamer() ->  RenamerName {
-
+    
 }
 
 #[cfg(test)]
