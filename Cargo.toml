@@ -1,0 +1,6 @@
+[package]
+name = "bulk-rename-rs"
+version = "0.1.0"
+authors = ["Jason Howell <jasonrobot64@gmail.com>"]
+
+[dependencies]
