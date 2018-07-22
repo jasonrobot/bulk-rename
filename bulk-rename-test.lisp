@@ -19,9 +19,14 @@
     :description "Test suite for the functions that handle the CLI tool.")
 (in-suite bulk-rename/main-test)
 
-;; (test parse-mode
-;;   (do-list-destructure
-;;       '(())))
+;; (test get-string-after-match)
+
+;; foo.a bar.a insert "x" at 1
+(test parse-insert-chars
+      (do-list-destructure
+          '((("foo.a" "bar.a" "insert" "x" "at" "1") (("foo.a" "bar.a") "insert" "x" "1")))
+        (input expected)
+        (is 
 
 (def-suite bulk-rename/rename-test
     :description "Test suite for the functions that do the renaming work.")

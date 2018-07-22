@@ -109,6 +109,7 @@ bulk-rename case (UPPER|UP|LOWER|DOWN|CAMEL|SNAKE|LISP|KEBAB) FILES
               (apply rename-function '(name . real-args)))
             names)))
 
+      
 ;; (defun do-rename (args)
 ;;     "ARGS is a list of strings."
 ;;   (let* ((names (get-names args))
@@ -119,6 +120,38 @@ bulk-rename case (UPPER|UP|LOWER|DOWN|CAMEL|SNAKE|LISP|KEBAB) FILES
 
 (defun start () (main (uiop:command-line-arguments)))
 
+;; function name &rest arg-names
+(setq renaming-functions
+      '((insert-chars "insert" ("insert" "at"))
+        (remove-chars "remove" "from" "to")))
+
+(defstruct renamer
+  function
+  name
+  args)
+
+(defun get-rename-function (argv)
+  "Get the naming function that we should use."
+  ;; find in renaming-functions the object where
+  (find-if
+   #'(lambda (func)
+       ;; find the name part in args
+       (find-if
+        #'(lambda (arg)
+            (string= (elt func 1)
+                     arg))))
+   renaming-functions))
+    
+
+(defun get-names (argv)
+  "Get the things that need to be renamed."
+  ;; return argv from beginning till a renamer keyword
+  )
+      
+
 (defun main (argv)
+  (let ((rename-function (get-rename-function argv))
+        (names (get-names argv)))
+    
   (write (do-insert-chars argv)))
 
