@@ -65,93 +65,121 @@ Change Case:
 bulk-rename case (UPPER|UP|LOWER|DOWN|CAMEL|SNAKE|LISP|KEBAB) FILES
 "))
 
-;;; Functions that are associated with unpacking the command line args
+;; ;;; Functions that are associated with unpacking the command line args
 
-(defun get-string-after-match (item source-sequence)
-  "Get the string after a match in a list of strings. NIL if no match or no next string after match."
-  (let ((item-pos (position-if #'(lambda (x) (string= x item))
-                               source-sequence)))
-    (when (and item-pos
-               (< (+ item-pos 1) (length source-sequence)))
-      (elt source-sequence (+ 1 item-pos)))))
+;; (defun get-string-after-match (item source-sequence)
+;;   "Get the string after a match in a list of strings. NIL if no match or no next string after match."
+;;   (let ((item-pos (position-if #'(lambda (x) (string= x item))
+;;                                source-sequence)))
+;;     (when (and item-pos
+;;                (< (+ item-pos 1) (length source-sequence)))
+;;       (elt source-sequence (+ 1 item-pos)))))
 
-(defun parse-keywords (args &rest keywords)
-  "Grabs data out of the args list."
-  (mapcar #'(lambda (kw) (get-string-after-match kw args)) keywords))
+;; (defun parse-keywords (args &rest keywords)
+;;   "Grabs data out of the args list."
+;;   (mapcar #'(lambda (kw) (get-string-after-match kw args)) keywords))
 
-(defun get-names (args delim)
-  ;; (subseq args (* number-of-keyword-args 2)))
-  (loop for item in args
-     until (string= item delim)
-     collect item))
+;; (defun get-names (args delim)
+;;   ;; (subseq args (* number-of-keyword-args 2)))
+;;   (loop for item in args
+;;      until (string= item delim)
+;;      collect item))
 
-;; (defun get-rename-args (args delim)
-  
+;; ;; (defun get-rename-args (args delim)
 
-(defun do-insert-chars (args)
-  (let ((real-args (parse-keywords args "insert" "at"))
-        (names (get-names args 2)))
-    (mapcar (lambda (name)
-              (insert-chars name (elt real-args 0) (parse-integer (elt real-args 1))))
-            names)))
 
-(defun do-remove-chars (args)
-  (let* ((real-args (parse-keywords args "from" "to"))
-         (names (get-names args (length real-args))))
-    (mapcar (lambda (name)
-              (apply #'remove-chars '(name . real-args)))
-            names)))
-
-(defun do-rename (args rename-function keywords)
-  (let* ((real-args (apply #'parse-keywords '(args . keywords)))
-         (names (get-names args (length keywords))))
-    (mapcar (lambda (name)
-              (apply rename-function '(name . real-args)))
-            names)))
-
-      
-;; (defun do-rename (args)
-;;     "ARGS is a list of strings."
-;;   (let* ((names (get-names args))
-;;          (operation (get-operation args))
-;;          (op-args (get-operation-args operation args)))
+;; (defun do-insert-chars (args)
+;;   (let ((real-args (parse-keywords args "insert" "at"))
+;;         (names (get-names args 2)))
 ;;     (mapcar (lambda (name)
-;;               (apply operation op-args name)))))
+;;               (insert-chars name (elt real-args 0) (parse-integer (elt real-args 1))))
+;;             names)))
+
+;; (defun do-remove-chars (args)
+;;   (let* ((real-args (parse-keywords args "from" "to"))
+;;          (names (get-names args (length real-args))))
+;;     (mapcar (lambda (name)
+;;               (apply #'remove-chars '(name . real-args)))
+;;             names)))
+
+;; (defun do-rename (args rename-function keywords)
+;;   (let* ((real-args (apply #'parse-keywords '(args . keywords)))
+;;          (names (get-names args (length keywords))))
+;;     (mapcar (lambda (name)
+;;               (apply rename-function '(name . real-args)))
+;;             names)))
+
+
+;; ;; (defun do-rename (args)
+;; ;;     "ARGS is a list of strings."
+;; ;;   (let* ((names (get-names args))
+;; ;;          (operation (get-operation args))
+;; ;;          (op-args (get-operation-args operation args)))
+;; ;;     (mapcar (lambda (name)
+;; ;;               (apply operation op-args name)))))
 
 (defun start () (main (uiop:command-line-arguments)))
 
-;; function name &rest arg-names
-(setq renaming-functions
-      '((insert-chars "insert" ("insert" "at"))
-        (remove-chars "remove" "from" "to")))
+;; ;; function name &rest arg-names
+;; (setq renaming-functions
+;;       '((insert-chars "insert" ("insert" "at"))
+;;         (remove-chars "remove" "from" "to")))
 
-(defstruct renamer
-  function
-  name
-  args)
+;; (defstruct renamer
+;;   function
+;;   name
+;;   args)
 
-(defun get-rename-function (argv)
-  "Get the naming function that we should use."
-  ;; find in renaming-functions the object where
-  (find-if
-   #'(lambda (func)
-       ;; find the name part in args
-       (find-if
-        #'(lambda (arg)
-            (string= (elt func 1)
-                     arg))))
-   renaming-functions))
-    
+;; (defun get-rename-function (argv)
+;;   "Get the naming function that we should use."
+;;   ;; find in renaming-functions the object where
+;;   (find-if
+;;    #'(lambda (func)
+;;        ;; find the name part in args
+;;        (find-if
+;;         #'(lambda (arg)
+;;             (string= (elt func 1)
+;;                      arg))))
+;;    renaming-functions))
 
-(defun get-names (argv)
-  "Get the things that need to be renamed."
-  ;; return argv from beginning till a renamer keyword
-  )
-      
+
+;; (defun get-names (argv)
+;;   "Get the things that need to be renamed."
+;;   ;; return argv from beginning till a renamer keyword
+;;   )
+
+
+;; (defun main (argv)
+;;   (write "Hello, world!"))
+
+(defun command-name (arguments commands)
+  "Get the first item in COMMANDS found in ARGUMENTS."
+  (remove-if-not #'(lambda (arg)
+                     (find arg
+                           commands
+                           :test #'string=))
+                 arguments))
+
+(defun command-index (arguments commands)
+  "Get the position of the first item in COMMANDS found in ARGUMENTS."
+  (car (remove nil
+               (mapcar #'(lambda (cmd)
+                           (position cmd
+                                     arguments
+                                     :test #'string=))
+                       commands))))
+
+(defun filename-args (arguments command-index command-argc)
+  "Drop items from ARGUMENTS from COMMAND-INDEX to (+ COMMAND-INDEX COMMAND-ARGC)."
+  (subseq arguments (+ command-index command-argc)))
 
 (defun main (argv)
-  (let ((rename-function (get-rename-function argv))
-        (names (get-names argv)))
-    
-  (write (do-insert-chars argv)))
+  (let* ((commands '("cmd" "end"))
+         (files (filename-args argv
+                               (command-index argv commands)
+                               1)))
+    (princ files))
 
+    ;; (print (command-name argv commands)))
+
+  (print "Hello, world!"))
